@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Video Generation Platform</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      xintegrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .feature-card {
+        scroll-snap-align: start;
+        min-width: 350px; /* bumped width */
+        flex-shrink: 0; /* added: prevent shrinking */
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+      .scroll-container {
+        scroll-snap-type: x mandatory;
+        overflow-x: auto;
+        display: flex;
+        gap: 1rem;
+        padding-bottom: 1rem;
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth; /* Add smooth scrolling */
+      }
+      .scroll-container::-webkit-scrollbar {
+        display: none;
+      }
+      .scroll-container {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .arrow-button {
+        background-color: white;
+        border-radius: 9999px;
+        padding: 0.75rem;
+        cursor: pointer;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1),
+          0 1px 2px -1px rgba(0, 0, 0, 0.1);
+      }
+      .arrow-button:hover {
+        background-color: #f0f0f0;
+      }
+      .feature-icon {
+        width: 64px;
+        height: 64px;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9999px;
+        background-color: #e0f2fe;
+        color: #1e40af;
+        overflow: hidden; /* Added to ensure images don't overflow the circular container */
+      }
+
+      .feature-icon img {
+        width: 40px;
+        height: 40px;
+        object-fit: contain; /* Ensures image maintains aspect ratio */
+      }
+      .feature-title {
+        font-size: 1.25rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: #1f2937;
+      }
+      .feature-description {
+        font-size: 0.875rem;
+        color: #4b5563;
+      }
+      .любят-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 2rem;
+        width: 100%;
+      }
+      .любим {
+        font-size: 1rem;
+        color: #71717a;
+        margin-bottom: 1rem;
+      }
+      .компании {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        margin-top: 1rem;
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 1rem;
+        gap: 2.5rem; /* Increased gap for better separation */
+        white-space: nowrap;
+        scroll-behavior: smooth;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        padding: 20px 10px; /* Added padding for better appearance */
+      }
+
+      .компании::-webkit-scrollbar {
+        display: none;
+      }
+
+      .компании img {
+        height: 35px; /* Standardized height */
+        object-fit: contain;
+        filter: grayscale(100%);
+        opacity: 0.7;
+        transition: opacity 0.3s ease, filter 0.3s ease;
+        max-width: 120px;
+      }
+
+      .компании img:hover {
+        opacity: 1;
+        filter: grayscale(0%);
+      }
+
+      /* Logo category styles */
+      .logo-category {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        margin-right: 25px;
+      }
+
+      .category-label {
+        font-size: 0.7rem;
+        color: #9ca3af;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .logo-wrapper {
+        display: flex;
+        align-items: center;
+        min-height: 45px; /* Ensure consistent height */
+      }
+
+      /* Fallback text for logos that fail to load */
+      .logo-fallback {
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: #6b7280;
+      }
+
+      /* Mobile menu styles */
+      .mobile-menu-btn {
+        display: none;
+      }
+
+      @media (max-width: 768px) {
+        .mobile-menu-btn {
+          display: block;
+          cursor: pointer;
+          z-index: 20;
+        }
+
+        .mobile-menu {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: #fff;
+          z-index: 15;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          transform: translateX(-100%);
+          transition: transform 0.3s ease-in-out;
+        }
+
+        .mobile-menu.active {
+          transform: translateX(0);
+        }
+
+        .mobile-menu a {
+          margin: 0.8rem 0;
+          font-size: 1.25rem;
+          color: #1f2937;
+        }
+
+        .mobile-menu-close {
+          position: absolute;
+          top: 1.5rem;
+          right: 1.5rem;
+          font-size: 1.5rem;
+          cursor: pointer;
+          color: #4b5563;
+        }
+
+        .mobile-auth {
+          margin-top: 2rem;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .mobile-auth a {
+          width: 200px;
+          text-align: center;
+        }
+      }
+      .avatar-card {
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+        min-width: 150px;
+      }
+      .avatar-image {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+      .avatar-name {
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 0.5rem;
+        text-align: center;
+        font-size: 0.875rem;
+        position: relative;
+        bottom: 0;
+        width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .scroll-container {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scroll-padding: 1rem;
+      }
+      .scroll-container > .avatar-card {
+        scroll-snap-align: start;
+        margin-right: 1rem;
+      }
+      .scroll-container::-webkit-scrollbar {
+        display: none;
+      }
+      .scroll-container {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .scroll-left {
+        direction: rtl; /* Change scroll direction for the first row */
+      }
+      .scroll-left > .avatar-card {
+        margin-left: 1rem; /* Add left margin for spacing in reversed direction */
+        margin-right: 0; /* Remove right margin */
+      }
+
+      /* /////////////////// */
+
+      .scroll-container {
+        display: flex;
+        gap: 1rem;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+
+      .avatar-card {
+        display: inline-block;
+        text-align: center;
+        width: 150px;
+        flex-shrink: 0;
+      }
+
+      .avatar-image {
+        width: 100%;
+        height: auto;
+        display: block;
+        border-radius: 0.25rem;
+        border: none;
+      }
+
+      .avatar-name {
+        margin-top: 0.5rem;
+        font-weight: 500;
+        color: #555;
+      }
+
+      .card {
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        padding: 2rem;
+        text-align: center;
+        display: flex; /* Use flexbox for vertical alignment */
+        flex-direction: column; /* Stack items vertically */
+        justify-content: space-between; /* Distribute space between items */
+      }
+      .card h3 {
+        font-size: 1.25rem;
+        font-weight: 500;
+        margin-bottom: 1rem;
+        color: #1e293b; /* Slightly darker heading color */
+      }
+      .card p {
+        font-size: 0.875rem;
+        color: #4b5563;
+        margin-bottom: 1.5rem;
+      }
+      .card-image {
+        width: 100%;
+        max-height: 200px; /* Limit image height */
+        object-fit: cover; /* Maintain aspect ratio and cover container */
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+      }
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        transition-colors: "duration-300 ease-in-out";
+        gap: 0.5rem; /* Space between text and arrow */
+      }
+      .blue-button {
+        background-color: #3b82f6;
+        color: white;
+        hover: bg-blue-700;
+      }
+      .blue-button:hover {
+        background-color: #2563eb;
+      }
+      .gray-button {
+        background-color: #e5e7eb;
+        color: #374151;
+        hover: bg-gray-300;
+      }
+      .gray-button:hover {
+        background-color: #d1d5db;
+      }
+      .arrow {
+        width: 1.5rem;
+        height: 1.5rem;
+        stroke-width: 2;
+        stroke: currentColor;
+        line-cap: round;
+        line-join: round;
+      }
+
+      /* /////////////////// */
+
+      .heading-text {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        line-height: 1.25;
+      }
+      .subheading-text {
+        font-size: 1rem;
+        color: #4b5563;
+      }
+
+      .step-card {
+        background-color: #fff;
+        border-radius: 0.75rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        padding: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .step-number {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+      }
+      .step-title {
+        font-size: 1.25rem;
+        font-weight: 500;
+        color: #1f2937;
+        margin-bottom: 0.25rem;
+      }
+      .step-description {
+        font-size: 0.875rem;
+        color: #4b5563;
+      }
+      .blue-button {
+        background-color: #3b82f6;
+        color: #fff;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background-color 0.3s ease;
+        margin-top: 2rem;
+      }
+      .blue-button:hover {
+        background-color: #2563eb;
+      }
+
+      .leader-badge {
+        background-color: #f5f5f5;
+        border-radius: 1.25rem;
+        padding: 0.25rem 0.75rem;
+        color: #374151;
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        border: 1px solid #d1d5db;
+      }
+
+      .top50-badge {
+        background-color: #fee500;
+        border-radius: 1.25rem;
+        padding: 0.25rem 0.75rem;
+        color: #1f2937;
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        border: 1px solid #d1d5db;
+      }
+
+      .green-dot {
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 50%;
+        background-color: #16a34a;
+      }
+
+      .awards-image {
+        max-width: 300px;
+        height: auto;
+        border-radius: 0.75rem;
+      }
+
+      /* ///////////////// */
+      .section-title {
+        font-size: 2.25rem; /* text-3xl */
+        font-weight: 600; /* font-semibold */
+        color: #1e293b; /* text-gray-800 */
+        line-height: 1.25;
+        margin-bottom: 1rem;
+      }
+      .section-subtitle {
+        font-size: 1rem;
+        color: #4b5563; /* text-gray-500 */
+        margin-bottom: 2rem;
+      }
+      .blue-button {
+        background-color: #3b82f6; /* bg-blue-500 */
+        color: #fff; /* text-white */
+        padding: 0.75rem 1.5rem; /* py-3 px-6 */
+        border-radius: 0.5rem; /* rounded-md */
+        font-weight: 600; /* font-semibold */
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background-color 0.3s ease;
+      }
+      .blue-button:hover {
+        background-color: #2563eb; /* hover:bg-blue-700 */
+      }
+      .video-card {
+        position: relative;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+      .video-card img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+      .video-title-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        padding: 0.5rem;
+        font-size: 0.875rem; /* text-sm */
+        text-align: left;
+      }
+      .get-inspired {
+        font-size: 0.875rem;
+        color: #3b82f6; /* text-blue-500 */
+        margin-bottom: 0.5rem;
+      }
+
+      /* Video Modal Styles */
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .modal-content {
+        position: relative;
+        width: 80%;
+        max-width: 800px;
+        background-color: #fff;
+        border-radius: 0.5rem;
+        overflow: hidden;
+      }
+
+      .modal-header {
+        padding: 1rem;
+        background-color: #f9fafb;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .modal-title {
+        font-size: 1.25rem;
+        font-weight: 500;
+        color: #111827;
+      }
+
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #6b7280;
+      }
+
+      .modal-body {
+        padding: 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-footer {
+        padding: 0.5rem;
+        background-color: #f9fafb;
+        border-top: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+      }
+
+      .modal-button {
+        background-color: #3b82f6;
+        color: white;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 0.375rem;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+      }
+
+      .modal-button:hover {
+        background-color: #2563eb;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 pt-16">
+    <header class="fixed top-0 left-0 w-full bg-white py-4 shadow-md z-50">
+      <div class="container mx-auto px-4 flex justify-between items-center">
+        <a href="#" class="text-xl font-bold text-blue-600">AI STUDIOS</a>
+        <nav class="hidden md:flex space-x-6">
+          <a
+            href="#"
+            class="text-gray-700 hover:text-blue-600 transition duration-300"
+            >Features</a
+          >
+          <a
+            href="#"
+            class="text-gray-700 hover:text-blue-600 transition duration-300"
+            >Solutions</a
+          >
+          <a
+            href="#"
+            class="text-gray-700 hover:text-blue-600 transition duration-300"
+            >Resources</a
+          >
+          <a
+            href="#"
+            class="text-gray-700 hover:text-blue-600 transition duration-300"
+            >Company</a
+          >
+          <a
+            href="#"
+            class="text-gray-700 hover:text-blue-600 transition duration-300"
+            >Pricing</a
+          >
+          <a
+            href="#"
+            class="text-gray-700 hover:text-blue-600 transition duration-300"
+            >Enterprise</a
+          >
+        </nav>
+        <div class="hidden md:flex space-x-4">
+          <a
+            href="#"
+            class="text-gray-700 hover:text-blue-600 transition duration-300"
+            >Login</a
+          >
+          <a
+            href="#"
+            class="bg-transparent hover:bg-blue-500 text-blue-700 hover:text-white border border-blue-500 rounded-md py-2 px-4 transition duration-300"
+            >Contact Sales</a
+          >
+          <a
+            href="#"
+            class="bg-blue-600 hover:bg-blue-700 text-white rounded-md py-2 px-6 transition duration-300"
+            >Sign Up</a
+          >
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <div class="mobile-menu-btn md:hidden">
+          <i class="fas fa-bars text-gray-700 text-xl"></i>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div class="mobile-menu md:hidden">
+          <div class="mobile-menu-close">
+            <i class="fas fa-times"></i>
+          </div>
+          <a href="#" class="transition duration-300 hover:text-blue-600"
+            >Features</a
+          >
+          <a href="#" class="transition duration-300 hover:text-blue-600"
+            >Solutions</a
+          >
+          <a href="#" class="transition duration-300 hover:text-blue-600"
+            >Resources</a
+          >
+          <a href="#" class="transition duration-300 hover:text-blue-600"
+            >Company</a
+          >
+          <a href="#" class="transition duration-300 hover:text-blue-600"
+            >Pricing</a
+          >
+          <a href="#" class="transition duration-300 hover:text-blue-600"
+            >Enterprise</a
+          >
+
+          <div class="mobile-auth">
+            <a href="#" class="transition duration-300 hover:text-blue-600"
+              >Login</a
+            >
+            <a
+              href="#"
+              class="bg-transparent hover:bg-blue-500 text-blue-700 hover:text-white border border-blue-500 rounded-md py-2 px-4 transition duration-300"
+              >Contact Sales</a
+            >
+            <a
+              href="#"
+              class="bg-blue-600 hover:bg-blue-700 text-white rounded-md py-2 px-6 transition duration-300"
+              >Sign Up</a
+            >
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="bg-gray-100 py-16 md:py-24">
+      <div class="container mx-auto px-4 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+          Translate Videos with AI Video Generator
+        </h1>
+        <p class="text-lg text-gray-600 mb-8">
+          Generate studio-quality videos with AI avatars and voiceovers in 80+
+          languages as easy as just typing in text.
+        </p>
+
+        <button
+          class="bg-blue-600 hover:bg-blue-700 text-white rounded-md py-3 px-8 text-lg transition duration-300"
+        >
+          Get Started for Free
+        </button>
+        <p class="text-sm text-gray-500 mt-2">
+          Unlimited Videos | No credit card required
+        </p>
+      </div>
+    </section>
+    <div class="flex justify-center mb-8">
+      <video controls width="640" height="360" class="rounded-lg shadow-lg">
+        <source src="./Images//ai.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+    </div>
+    <section class="bg-gray-100 py-16">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-8">
+          <div class="любят-section">
+            <h2 class="любим">Loved by 2,000,000+ Users</h2>
+            <div class="компании">
+              <!-- Technology Companies -->
+              <div class="logo-category">
+                <span class="category-label">Technology</span>
+                <div class="logo-wrapper">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg"
+                    alt="Apple"
+                    onerror="this.onerror=null; this.src=''; this.insertAdjacentHTML('afterend', '<span class=\'logo-fallback\'>Apple</span>'); this.style.display='none';"
+                  />
+                </div>
+              </div>
+
+              <div class="logo-category">
+                <span class="category-label">Technology</span>
+                <div class="logo-wrapper">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"
+                    alt="Google"
+                    onerror="this.onerror=null; this.src=''; this.insertAdjacentHTML('afterend', '<span class=\'logo-fallback\'>Google</span>'); this.style.display='none';"
+                  />
+                </div>
+              </div>
+
+              <div class="logo-category">
+                <span class="category-label">Technology</span>
+                <div class="logo-wrapper">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg"
+                    alt="Microsoft"
+                    onerror="this.onerror=null; this.src=''; this.insertAdjacentHTML('afterend', '<span class=\'logo-fallback\'>Microsoft</span>'); this.style.display='none';"
+                  />
+                </div>
+              </div>
+
+              <div class="logo-category">
+                <span class="category-label">Technology</span>
+                <div class="logo-wrapper">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg"
+                    alt="IBM"
+                    onerror="this.onerror=null; this.src=''; this.insertAdjacentHTML('afterend', '<span class=\'logo-fallback\'>IBM</span>'); this.style.display='none';"
+                  />
+                </div>
+              </div>
+
+              <div class="logo-category">
+                <span class="category-label">E-commerce</span>
+                <div class="logo-wrapper">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
+                    alt="Amazon"
+                    onerror="this.onerror=null; this.src=''; this.insertAdjacentHTML('afterend', '<span class=\'logo-fallback\'>Amazon</span>'); this.style.display='none';"
+                  />
+                </div>
+              </div>
+
+              <div class="logo-category">
+                <span class="category-label">Streaming</span>
+                <div class="logo-wrapper">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/7/7a/Logonetflix.png"
+                    alt="Netflix"
+                    onerror="this.onerror=null; this.src=''; this.insertAdjacentHTML('afterend', '<span class=\'logo-fallback\'>Netflix</span>'); this.style.display='none';"
+                  />
+                </div>
+              </div>
+
+              <!-- Financial Services -->
+              <div class="logo-category">
+                <span class="category-label">Finance</span>
+                <div class="logo-wrapper">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg"
+                    alt="Visa"
+                    onerror="this.onerror=null; this.src=''; this.insertAdjacentHTML('afterend', '<span class=\'logo-fallback\'>Visa</span>'); this.style.display='none';"
+                  />
+                </div>
+              </div>
+
+              <div class="logo-category">
+                <span class="category-label">Finance</span>
+                <div class="logo-wrapper">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg"
+                    alt="Mastercard"
+                    onerror="this.onerror=null; this.src=''; this.insertAdjacentHTML('afterend', '<span class=\'logo-fallback\'>Mastercard</span>'); this.style.display='none';"
+                  />
+                </div>
+              </div>
+
+              <div class="logo-category">
+                <span class="category-label">Finance</span>
+                <div class="logo-wrapper">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg"
+                    alt="American Express"
+                    onerror="this.onerror=null; this.src=''; this.insertAdjacentHTML('afterend', '<span class=\'logo-fallback\'>Amex</span>'); this.style.display='none';"
+                  />
+                </div>
+              </div>
+
+              <div class="logo-category">
+                <span class="category-label">Finance</span>
+                <div class="logo-wrapper">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
+                    alt="PayPal"
+                    onerror="this.onerror=null; this.src=''; this.insertAdjacentHTML('afterend', '<span class=\'logo-fallback\'>PayPal</span>'); this.style.display='none';"
+                  />
+                </div>
+              </div>
+
+              <!-- Consumer Brands -->
+              <div class="logo-category">
+                <span class="category-label">Beverages</span>
+                <div class="logo-wrapper">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/c/ce/Coca-Cola_logo.svg"
+                    alt="Coca-Cola"
+                    onerror="this.onerror=null; this.src=''; this.insertAdjacentHTML('afterend', '<span class=\'logo-fallback\'>Coca-Cola</span>'); this.style.display='none';"
+                  />
+                </div>
+              </div>
+
+              <div class="logo-category">
+                <span class="category-label">Footwear</span>
+                <div class="logo-wrapper">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg"
+                    alt="Adidas"
+                    onerror="this.onerror=null; this.src=''; this.insertAdjacentHTML('afterend', '<span class=\'logo-fallback\'>Adidas</span>'); this.style.display='none';"
+                  />
+                </div>
+              </div>
+
+              <div class="logo-category">
+                <span class="category-label">Footwear</span>
+                <div class="logo-wrapper">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/a/a6/Nike_Logo.svg"
+                    alt="Nike"
+                    onerror="this.onerror=null; this.src=''; this.insertAdjacentHTML('afterend', '<span class=\'logo-fallback\'>Nike</span>'); this.style.display='none';"
+                  />
+                </div>
+              </div>
+
+              <div class="logo-category">
+                <span class="category-label">Coffee</span>
+                <div class="logo-wrapper">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/en/d/d3/Starbucks_Corporation_Logo_2011.svg"
+                    alt="Starbucks"
+                    onerror="this.onerror=null; this.src=''; this.insertAdjacentHTML('afterend', '<span class=\'logo-fallback\'>Starbucks</span>'); this.style.display='none';"
+                  />
+                </div>
+              </div>
+
+              <!-- Automotive -->
+              <div class="logo-category">
+                <span class="category-label">Automotive</span>
+                <div class="logo-wrapper">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/4/44/BMW.svg"
+                    alt="BMW"
+                    onerror="this.onerror=null; this.src=''; this.insertAdjacentHTML('afterend', '<span class=\'logo-fallback\'>BMW</span>'); this.style.display='none';"
+                  />
+                </div>
+              </div>
+
+              <div class="logo-category">
+                <span class="category-label">Automotive</span>
+                <div class="logo-wrapper">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_logo.png"
+                    alt="Tesla"
+                    onerror="this.onerror=null; this.src=''; this.insertAdjacentHTML('afterend', '<span class=\'logo-fallback\'>Tesla</span>'); this.style.display='none';"
+                  />
+                </div>
+              </div>
+
+              <div class="logo-category">
+                <span class="category-label">Automotive</span>
+                <div class="logo-wrapper">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/9/92/Toyota_logo.svg"
+                    alt="Toyota"
+                    onerror="this.onerror=null; this.src=''; this.insertAdjacentHTML('afterend', '<span class=\'logo-fallback\'>Toyota</span>'); this.style.display='none';"
+                  />
+                </div>
+              </div>
+
+              <!-- Entertainment -->
+              <div class="logo-category">
+                <span class="category-label">Entertainment</span>
+                <div class="logo-wrapper">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Disney_wordmark.svg"
+                    alt="Disney"
+                    onerror="this.onerror=null; this.src=''; this.insertAdjacentHTML('afterend', '<span class=\'logo-fallback\'>Disney</span>'); this.style.display='none';"
+                  />
+                </div>
+              </div>
+
+              <div class="logo-category">
+                <span class="category-label">Entertainment</span>
+                <div class="logo-wrapper">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/2/2f/ESPN_wordmark.svg"
+                    alt="ESPN"
+                    onerror="this.onerror=null; this.src=''; this.insertAdjacentHTML('afterend', '<span class=\'logo-fallback\'>ESPN</span>'); this.style.display='none';"
+                  />
+                </div>
+              </div>
+
+              <!-- Telecommunications -->
+              <div class="logo-category">
+                <span class="category-label">Telecom</span>
+                <div class="logo-wrapper">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/3/31/AT%26T_logo_2016.svg"
+                    alt="AT&T"
+                    onerror="this.onerror=null; this.src=''; this.insertAdjacentHTML('afterend', '<span class=\'logo-fallback\'>AT&T</span>'); this.style.display='none';"
+                  />
+                </div>
+              </div>
+
+              <div class="logo-category">
+                <span class="category-label">Telecom</span>
+                <div class="logo-wrapper">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/9/94/Verizon_Logo_2015.svg"
+                    alt="Verizon"
+                    onerror="this.onerror=null; this.src=''; this.insertAdjacentHTML('afterend', '<span class=\'logo-fallback\'>Verizon</span>'); this.style.display='none';"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <h2 class="text-2xl font-semibold text-gray-800">
+            Video Platform Built with the Most Advanced AI Tools
+          </h2>
+        </div>
+        <div class="flex items-center justify-between mb-4">
+          <button id="scroll-left" class="arrow-button">
+            <i class="fas fa-chevron-left text-gray-700"></i>
+          </button>
+          <button id="scroll-right" class="arrow-button">
+            <i class="fas fa-chevron-right text-gray-700"></i>
+          </button>
+        </div>
+
+        <!-- Center the feature cards under the heading -->
+        <div class="scroll-container mx-auto px-12 max-w-screen-2xl">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <img
+                src="https://img.icons8.com/color/96/000000/powerpoint.png"
+                alt="PPT Upload Icon"
+              />
+            </div>
+            <h3 class="feature-title">PPT Upload</h3>
+            <p class="feature-description">
+              Import presentation slides as video scenes
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <img
+                src="https://img.icons8.com/color/96/000000/avatar.png"
+                alt="Photo Avatar Icon"
+              />
+            </div>
+            <h3 class="feature-title">Photo Avatar</h3>
+            <p class="feature-description">
+              Turn a photo into a talking avatar
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/1179/1179120.png"
+                alt="Video Highlights Icon"
+                onerror="this.src='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/icons/camera-video.svg'; this.style.width='30px';"
+              />
+            </div>
+            <h3 class="feature-title">Video Highlights</h3>
+            <p class="feature-description">
+              Extract shot clips from long videos
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <img
+                src="https://img.icons8.com/color/96/000000/video-playlist.png"
+                alt="Series of Videos Icon"
+              />
+            </div>
+            <h3 class="feature-title">Series of Videos</h3>
+            <p class="feature-description">
+              Automate video production on a schedule
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <img
+                src="https://img.icons8.com/color/96/000000/video-message.png"
+                alt="Video Messages Icon"
+              />
+            </div>
+            <h3 class="feature-title">Video Messages</h3>
+            <p class="feature-description">
+              Create personalized custom videos at scale
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <img
+                src="https://img.icons8.com/color/96/000000/downloading-updates.png"
+                alt="Social Media Downloader Icon"
+              />
+            </div>
+            <h3 class="feature-title">Social Media Downloader</h3>
+            <p class="feature-description">
+              Download videos from social media via URL
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/1705/1705814.png"
+                alt="Chroma Key Icon"
+                onerror="this.src='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/icons/filter-square.svg'; this.style.width='30px';"
+              />
+            </div>
+            <h3 class="feature-title">Chroma Key</h3>
+            <p class="feature-description">
+              Create avatar videos with a green screen effect
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="text-center mb-8">
+      <h2 class="text-3xl font-semibold text-gray-700">
+        Create Content That Connects on a Human Level
+      </h2>
+      <p class="mt-2 text-xl text-gray-600">150+ Ready-to-Use AI Avatars</p>
+      <button
+        class="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2.5 px-5 rounded-lg transition-colors duration-300"
+      >
+        Explore All Avatars
+      </button>
+    </section>
+
+    <section class="container mx-auto px-6">
+      <div class="scroll-container" id="avatar-row-1">
+        <div class="avatar-card">
+          <img
+            src="https://i.pravatar.cc/150?u=a001"
+            alt="Avatar 1"
+            class="avatar-image"
+          />
+          <div class="avatar-name">Aaliyah</div>
+        </div>
+        <div class="avatar-card">
+          <img
+            src="https://i.pravatar.cc/150?u=a002"
+            alt="Avatar 2"
+            class="avatar-image"
+          />
+          <div class="avatar-name">Ethan</div>
+        </div>
+        <div class="avatar-card">
+          <img
+            src="https://i.pravatar.cc/150?u=a003"
+            alt="Avatar 3"
+            class="avatar-image"
+          />
+          <div class="avatar-name">Sofia</div>
+        </div>
+        <div class="avatar-card">
+          <img
+            src="https://i.pravatar.cc/150?u=a004"
+            alt="Avatar 4"
+            class="avatar-image"
+          />
+          <div class="avatar-name">Jackson</div>
+        </div>
+        <div class="avatar-card">
+          <img
+            src="https://i.pravatar.cc/150?u=a005"
+            alt="Avatar 5"
+            class="avatar-image"
+          />
+          <div class="avatar-name">Olivia</div>
+        </div>
+        <div class="avatar-card">
+          <img
+            src="https://i.pravatar.cc/150?u=a006"
+            alt="Avatar 6"
+            class="avatar-image"
+          />
+          <div class="avatar-name">Liam</div>
+        </div>
+      </div>
+      <div class="scroll-container" id="avatar-row-2">
+        <div class="avatar-card">
+          <img
+            src="https://i.pravatar.cc/150?u=b001"
+            alt="Avatar 7"
+            class="avatar-image"
+          />
+          <div class="avatar-name">Isabella</div>
+        </div>
+        <div class="avatar-card">
+          <img
+            src="https://i.pravatar.cc/150?u=b002"
+            alt="Avatar 8"
+            class="avatar-image"
+          />
+          <div class="avatar-name">Noah</div>
+        </div>
+        <div class="avatar-card">
+          <img
+            src="https://i.pravatar.cc/150?u=b003"
+            alt="Avatar 9"
+            class="avatar-image"
+          />
+          <div class="avatar-name">Mia</div>
+        </div>
+        <div class="avatar-card">
+          <img
+            src="https://i.pravatar.cc/150?u=b004"
+            alt="Avatar 10"
+            class="avatar-image"
+          />
+          <div class="avatar-name">William</div>
+        </div>
+        <div class="avatar-card">
+          <img
+            src="https://i.pravatar.cc/150?u=b005"
+            alt="Avatar 11"
+            class="avatar-image"
+          />
+          <div class="avatar-name">Ava</div>
+        </div>
+        <div class="avatar-card">
+          <img
+            src="https://i.pravatar.cc/150?u=b006"
+            alt="Avatar 12"
+            class="avatar-image"
+          />
+          <div class="avatar-name">James</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="text-center mb-8 mt-14">
+      <h2 class="text-2xl font-semibold text-gray-800">Custom Avatars</h2>
+      <p class="mt-2 text-gray-600">Create Your Own Realistic AI Avatar</p>
+      <p class="mt-2 text-gray-600">
+        Design a custom AI avatar that fits exactly what your video calls for.
+      </p>
+    </section>
+
+    <section
+      class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 mt-12"
+    >
+      <div class="card">
+        <h3>Photo Avatar</h3>
+        <p>
+          Turn ordinary photos into engaging avatars. Upload a portrait, enter a
+          script, and watch your image come to life.
+        </p>
+        <img
+          src="https://images.pexels.com/photos/1187260/pexels-photo-1187260.jpeg?auto=compress&cs=tinysrgb&w=800"
+          alt="Photo Avatar"
+          class="card-image"
+        />
+        <button class="button blue-button">
+          Create Now
+          <svg xmlns="http://www.w3.org/2000/svg" class="arrow">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+      <div class="card">
+        <h3>Instant Avatar</h3>
+        <p>
+          Create a digital twin in minutes: read a script in front of your
+          webcam or upload footage from your smartphone.
+        </p>
+        <img
+          src="https://images.pexels.com/photos/20787/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=800"
+          alt="Instant Avatar"
+          class="card-image"
+        />
+        <button class="button blue-button">
+          Create Now
+          <svg xmlns="http://www.w3.org/2000/svg" class="arrow">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+      <div class="card">
+        <h3>Studio Avatar</h3>
+        <p>
+          Create a custom full-body avatar for production-grade videos and
+          avatar projects.
+        </p>
+        <img
+          src="https://images.pexels.com/photos/106885/pexels-photo-106885.jpeg?auto=compress&cs=tinysrgb&w=800"
+          alt="Studio Avatar"
+          class="card-image"
+        />
+        <button class="button gray-button">
+          Contact Us
+          <svg xmlns="http://www.w3.org/2000/svg" class="arrow">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <section
+      class="container mx-auto px-6 text-center max-w-screen-lg mt-16 mb-12"
+    >
+      <h1 class="heading-text">How to Use an AI Video Maker</h1>
+      <p class="subheading-text">
+        Follow these simple steps, and you'll have a polished video ready in no
+        time using the best AI Video Generator.
+      </p>
+      <a href="#" class="blue-button mx-auto mt-6">
+        Create a Free Video
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="lucide lucide-arrow-right"
+        >
+          <path d="M5 12h14" />
+          <path d="m12 5 7 7-7 7" />
+        </svg>
+      </a>
+
+      <section class="container mx-auto px-6 mt-12 flex justify-end mb-16">
+        <img
+          src="https://cdn.prod.website-files.com/63da3362f67ed6f71c9489c1/6790b295452094823eec1574_awards_img_2025-p-500.png"
+          alt="Awards"
+          class="awards-image"
+        />
+      </section>
+    </section>
+
+    <section
+      class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8 mt-8 mb-12"
+    >
+      <div class="text-center step-card">
+        <span class="step-number">1</span>
+        <h3 class="step-title">Create a Script</h3>
+        <p class="step-description">
+          Begin by generating your script by uploading a URL or document,
+          providing a prompt, or simply typing it in yourself.
+        </p>
+      </div>
+      <div class="text-center step-card">
+        <span class="step-number">2</span>
+        <h3 class="step-title">Customize & Edit</h3>
+        <p class="step-description">
+          Bring your video to life by choosing an avatar and voice that match
+          your message. Add text, images, animations, and more.
+        </p>
+      </div>
+      <div class="text-center step-card">
+        <span class="step-number">3</span>
+        <h3 class="step-title">Collaborate with Team</h3>
+        <p class="step-description">
+          Share your video project with your team through the synchronized
+          workspace or with a link, and work together to finalize it.
+        </p>
+      </div>
+      <div class="text-center step-card">
+        <span class="step-number">4</span>
+        <h3 class="step-title">Generate & Share</h3>
+        <p class="step-description">
+          Generate the video and even translate it into multiple languages if
+          needed. Then, share the link or embed it anywhere.
+        </p>
+      </div>
+    </section>
+
+    <!-- Examples section -->
+    <section class="container mx-auto px-6 my-20">
+      <h2
+        class="text-4xl md:text-5xl font-bold text-gray-900 text-center mb-10"
+      >
+        Built with AI Studios
+      </h2>
+      <div class="flex flex-col md:flex-row items-start md:items-center gap-16">
+        <div class="md:w-1/2 flex flex-col justify-center space-y-6 pr-8">
+          <p class="get-inspired text-blue-500 uppercase tracking-wide">
+            Get Inspired
+          </p>
+          <h3
+            class="section-title text-3xl md:text-4xl font-semibold text-gray-800"
+          >
+            Our Showcase Examples
+          </h3>
+          <p class="section-subtitle text-gray-600 leading-relaxed">
+            Explore what's possible with AI Studios! From dynamic educational
+            presentations to personalized video messages, these examples are
+            just a peek at the creative power AI Studios has to offer.
+          </p>
+          <a
+            href="#"
+            class="blue-button inline-flex items-center py-4 px-8 text-lg"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-5 h-5 mr-2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 9 9 0 1118.81-8.775 4.5 4.5 0 01-1.41 8.775"
+              />
+            </svg>
+            Create a Free Video
+          </a>
+        </div>
+        <div class="md:w-1/2 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="video-card rounded-lg overflow-hidden relative">
+            <video controls class="w-full">
+              <source
+                src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+                type="video/mp4"
+              />
+            </video>
+            <div class="video-title-overlay">Sales Enablement</div>
+          </div>
+          <div class="video-card rounded-lg overflow-hidden relative">
+            <video controls class="w-full">
+              <source
+                src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+                type="video/mp4"
+              />
+            </video>
+            <div class="video-title-overlay">Academic Lectures</div>
+          </div>
+          <div class="video-card rounded-lg overflow-hidden relative">
+            <video controls class="w-full">
+              <source
+                src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
+                type="video/mp4"
+              />
+            </video>
+            <div class="video-title-overlay">Internal Training</div>
+          </div>
+          <div class="video-card rounded-lg overflow-hidden relative">
+            <video controls class="w-full">
+              <source
+                src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
+                type="video/mp4"
+              />
+            </video>
+            <div class="video-title-overlay">Marketing Videos</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Video Modal (hidden by default) -->
+    <div
+      id="video-modal"
+      class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden"
+    >
+      <div class="relative w-11/12 md:w-3/4 lg:w-1/2 bg-black">
+        <button
+          id="modal-close"
+          class="absolute top-2 right-2 text-white text-2xl"
+        >
+          &times;
+        </button>
+        <iframe
+          id="modal-video"
+          width="100%"
+          height="400"
+          src=""
+          frameborder="0"
+          allow="autoplay; encrypted-media"
+          allowfullscreen
+        ></iframe>
+      </div>
+    </div>
+
+    <script>
+      const scrollLeftButton = document.getElementById("scroll-left");
+      const scrollRightButton = document.getElementById("scroll-right");
+      const container = document.querySelector(".scroll-container");
+      const logoContainer = document.querySelector(".компании");
+
+      // Mobile menu functionality
+      const mobileMenuBtn = document.querySelector(".mobile-menu-btn");
+      const mobileMenu = document.querySelector(".mobile-menu");
+      const mobileMenuClose = document.querySelector(".mobile-menu-close");
+
+      mobileMenuBtn.addEventListener("click", () => {
+        mobileMenu.classList.add("active");
+        document.body.style.overflow = "hidden"; // Prevent scrolling when menu is open
+      });
+
+      mobileMenuClose.addEventListener("click", () => {
+        mobileMenu.classList.remove("active");
+        document.body.style.overflow = ""; // Re-enable scrolling
+      });
+
+      scrollLeftButton.addEventListener("click", () => {
+        container.scrollLeft -= 300;
+      });
+
+      scrollRightButton.addEventListener("click", () => {
+        container.scrollLeft += 300;
+      });
+
+      // Auto-scroll for company logos
+      let autoScrollInterval;
+      let scrollDirection = 1; // 1 for right, -1 for left
+      const scrollSpeed = 1.5; // Adjusted for smoother scrolling
+
+      function startAutoScroll() {
+        // Start with left-to-right scrolling only
+        scrollDirection = 1;
+
+        autoScrollInterval = setInterval(() => {
+          // If we reach the end, reset to the beginning for continuous left-to-right scrolling
+          if (
+            logoContainer.scrollLeft + logoContainer.offsetWidth >=
+            logoContainer.scrollWidth - 20
+          ) {
+            // Smoothly return to the start
+            logoContainer.scrollTo({
+              left: 0,
+              behavior: "auto",
+            });
+          } else {
+            // Continue scrolling right
+            logoContainer.scrollLeft += scrollSpeed;
+          }
+        }, 25); // Slightly faster interval for smoother animation
+      }
+
+      function stopAutoScroll() {
+        clearInterval(autoScrollInterval);
+      }
+
+      // Get the avatar row containers by ID for more reliable selection
+      const avatarRow1 = document.getElementById("avatar-row-1");
+      const avatarRow2 = document.getElementById("avatar-row-2");
+
+      // Auto-scroll for avatar rows
+      let avatarRow1Interval;
+      let avatarRow2Interval;
+      const avatarScrollSpeed = 2; // Increased for more visible scrolling
+
+      function startAvatarAutoScroll() {
+        // First row scrolls right to left (oppositely from second row)
+        avatarRow1Interval = setInterval(() => {
+          // For RTL container, we need to increment scrollLeft to go left
+          avatarRow1.scrollLeft += avatarScrollSpeed;
+
+          // When reaching near the end of scroll, jump back to start
+          if (
+            avatarRow1.scrollLeft >=
+            avatarRow1.scrollWidth - avatarRow1.offsetWidth - 20
+          ) {
+            avatarRow1.scrollTo({
+              left: 0,
+              behavior: "auto",
+            });
+          }
+        }, 20); // Faster interval for smoother animation
+
+        // Second row scrolls left to right (normal direction)
+        avatarRow2Interval = setInterval(() => {
+          avatarRow2.scrollLeft += avatarScrollSpeed;
+
+          // When reaching near the end of scroll, jump back to start
+          if (
+            avatarRow2.scrollLeft >=
+            avatarRow2.scrollWidth - avatarRow2.offsetWidth - 20
+          ) {
+            avatarRow2.scrollTo({
+              left: 0,
+              behavior: "auto",
+            });
+          }
+        }, 20);
+      }
+
+      function stopAvatarAutoScroll() {
+        clearInterval(avatarRow1Interval);
+        clearInterval(avatarRow2Interval);
+      }
+
+      // Start auto-scroll as soon as the page loads
+      window.addEventListener("load", function () {
+        startAutoScroll();
+
+        // Small delay to ensure DOM is fully ready before starting avatar scrolling
+        setTimeout(startAvatarAutoScroll, 500);
+      });
+
+      // Stop auto-scroll on hover, restart on mouse leave
+      logoContainer.addEventListener("mouseenter", stopAutoScroll);
+      logoContainer.addEventListener("mouseleave", startAutoScroll);
+      avatarRow1.addEventListener("mouseenter", stopAvatarAutoScroll);
+      avatarRow1.addEventListener("mouseleave", startAvatarAutoScroll);
+      avatarRow2.addEventListener("mouseenter", stopAvatarAutoScroll);
+      avatarRow2.addEventListener("mouseleave", startAvatarAutoScroll);
+
+      document.querySelectorAll(".scroll-container").forEach((container, i) => {
+        const clone = container.innerHTML;
+        container.innerHTML += clone;
+      });
+    </script>
+    <!-- replace thumbnail with modal player on click -->
+    <script>
+      document.querySelectorAll(".video-card").forEach((card) => {
+        card.addEventListener("click", () => {
+          const id = card.getAttribute("data-video-id");
+          const modal = document.getElementById("video-modal");
+          const iframe = document.getElementById("modal-video");
+          iframe.src =
+            "https://www.youtube.com/embed/" + id + "?autoplay=1&rel=0";
+          modal.classList.remove("hidden");
+        });
+      });
+
+      // modal close
+      document.getElementById("modal-close").addEventListener("click", () => {
+        const modal = document.getElementById("video-modal");
+        const iframe = document.getElementById("modal-video");
+        iframe.src = "";
+        modal.classList.add("hidden");
+      });
+    </script>
+  </body>
+</html>
